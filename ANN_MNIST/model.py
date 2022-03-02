@@ -47,7 +47,7 @@ model=NN(input=input_size,output=output)
 #Loss and optimizer
 
 criterion=nn.CrossEntropyLoss()
-optimizer=
+optimizer
 
 
 
