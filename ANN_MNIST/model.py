@@ -32,6 +32,7 @@ num_epochs=2
 import torchvision.datasets as datasets
 from torch.utils.data import DataLoader
 import torchvision.transforms as transforms
+import torch.optim as optim
 
 
 train_dataset=datasets.MNIST(root='datset/',train=True,transform=transforms.ToTensor(),download=True)
@@ -47,7 +48,51 @@ model=NN(input=input_size,output=output)
 #Loss and optimizer
 
 criterion=nn.CrossEntropyLoss()
-optimizer
+optimizer=optim.Adam(model.parameters(),lr=learning_rate)
+
+#Train Network
+
+for epoch in range(num_epochs):
+    for batch_idx,(data,targets) in enumerate(train_loader):
+        #Get data to cuda if possible
+        data=data.to(device=device)
+
+        #Get to correct shape
+        data=data.reshape(data.shape[0],-1)
+
+        #forward
+        scores=model(data)
+        loss=criterion(scores,targets)
+
+        #backward
+        optimizer.zero_grad()
+        loss.backward()
+
+        #gradient descent or adam step
+
+        optimizer.step()
+
+#check accuracy on training & test to see how good our model
+
+def check_accuracy(loader,model):
+    if loader.dataset.train:
+        print('checking accuracy on training data')  
+    num_correct=0
+    num_samples=0
+    model.eval()
+
+    with torch.no_grad():
+        for x,y in loader:
+            x=x.to(device=device)
+            y=y.to(device=device)
+            x=x.reshape(x.shape[0],-1)
+
+            scores=model(x)
+            _,predictions=scores.max(1)
+            num_correct +=(predictions==y).sum()
+            num_samples+=predictions.size(0)
+        print(f'Got {num_correct}/{num_samples} with accuracy ')    
+
 
 
 
